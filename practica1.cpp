@@ -141,6 +141,7 @@ void compararCadenas(string &w1, string &w2)
 {
 	cout<<"\n\n\t3) COMPARAR AMBAS CADENAS"<<endl;
 	cout<<"\tComparacion entre la cadena w1 y w2\n\n";
+	
 	/* Para indicar si es prefijo (propio o no propio) */
 
 	//la ocurrencia debe ocurrir al comienzo de la cadena
@@ -148,8 +149,13 @@ void compararCadenas(string &w1, string &w2)
 
 	if(regex_search(w2, prefijo))
 	{
-		cout<<"w1 es PREFIJO de w2"<<endl;
-
+		if(w1!=w2)
+		{
+			cout<<"w1 es PREFIJO PROPIO de w2"<<endl;
+		}else
+		{
+			cout<<"w1 es PREFIJO NO PROPIO de w2"<<endl;
+		}
 	}else
 	{
 		cout<<"w1 NO es PREFIJO de w2"<<endl;	
@@ -162,7 +168,13 @@ void compararCadenas(string &w1, string &w2)
 
 	if(regex_search(w2, sufijo))
 	{
-		cout<<"w1 es SUFIJO de w2"<<endl;
+		if(w1!=w2)
+		{
+			cout<<"w1 es SUFIJO PROPIO de w2"<<endl;
+		}else
+		{
+			cout<<"w1 es SUFIJO NO PROPIO de w2"<<endl;
+		}
 	}else
 	{
 		cout<<"w1 NO es SUFIJO de w2"<<endl;	
