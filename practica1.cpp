@@ -17,6 +17,7 @@ using namespace std;
 string leerAlfabeto();
 void leerCadenas(string &w1, string &w2, string alfa);
 void compararCadenas(string &w1, string &w2);
+void expresionRegular();
 
 int main()
 {
@@ -30,6 +31,7 @@ int main()
     regex alfabeto(alfa);
     cout<<"\nEl alfabeto ingresado es: "<<alfa<<endl;
     leerCadenas(w1,w2,alfa);
+    expresionRegular();
 
 
 	return 0;
@@ -120,7 +122,7 @@ void leerCadenas(string &w1, string &w2, string alfa)
 
 	do{
 		w2 = "";
-		cout<<"b. Ingrese la cadena w2:"<<endl;
+		cout<<"\nb. Ingrese la cadena w2:"<<endl;
 		cin>>w2;
 
 		if(regex_match(w2,alfabeto))
@@ -216,4 +218,37 @@ void compararCadenas(string &w1, string &w2)
 	{
 		cout<<"\tNO es SUBSECUENCIA"<<endl;
 	}
+
+	system("pause");
+}
+
+void expresionRegular()
+{
+	int op;
+	string a = "";
+
+	system("cls");
+	// [b-hj-np-tv-z]e[b-hj-np-tv-z]+[b-df-np-tv-z]i[b-df-np-tv-z]+[b-df-hj-tv-z]o[b-df-hj-tv-z]+[b-df-hj-np-z]u[b-df-hj-np-z]
+	regex expresionr("^[a-df-hj-np-tv-z]*a[a-df-hj-np-tv-z]*e[b-hj-np-tv-z]*i[b-df-np-tv-z]*o[b-df-hj-tv-z]*u[b-df-hj-np-z]*$");
+
+	cout<<"\n\n\t7) IMPLEMENTACION DE UNA EXPRESION REGULAR"<<endl;
+	cout<<"\t1. Todas las cadenas de letras en minusculas (a-z) que contengan las 5 vocales en orden."<<endl;
+	cout<<"\t2. Las vocales pueden estar repetidas siempre que mantengan el orden."<<endl;
+	cout<<"\t3. La secuencia completa de vocales tambien puede repetirse."<<endl;
+	cout<<"\t\ta. Ejemplo de cadena valida: rtaeioujutf"<<endl;
+	cout<<"\t\ta. Ejemplo de cadena invalida: kayteemnoyug"<<endl;
+
+	while(true)
+	{
+		cin>>a;
+		if(regex_match(a,expresionr))
+		{
+			cout<<"Cadena valida"<<endl;
+			break;
+		}else
+		{
+			cout<<"Cadena invalida"<<endl;
+		}
+	}
+
 }
