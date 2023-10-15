@@ -139,10 +139,13 @@ void leerCadenas(string &w1, string &w2, string alfa)
 
 void compararCadenas(string &w1, string &w2)
 {
+	string cadena = "";
+
 	cout<<"\n\n\t3) COMPARAR AMBAS CADENAS"<<endl;
 	cout<<"\tComparacion entre la cadena w1 y w2\n\n";
+	cout<<"\tw1 respecto a w2:"<<endl;
 	
-	/* Para indicar si es prefijo (propio o no propio) */
+	/* PREFIJO (PROPIO O NO PROPIO) */
 
 	//la ocurrencia debe ocurrir al comienzo de la cadena
 	regex prefijo("^" + w1);
@@ -151,17 +154,17 @@ void compararCadenas(string &w1, string &w2)
 	{
 		if(w1!=w2)
 		{
-			cout<<"w1 es PREFIJO PROPIO de w2"<<endl;
+			cout<<"\tes PREFIJO PROPIO"<<endl;
 		}else
 		{
-			cout<<"w1 es PREFIJO NO PROPIO de w2"<<endl;
+			cout<<"\tes PREFIJO NO PROPIO"<<endl;
 		}
 	}else
 	{
-		cout<<"w1 NO es PREFIJO de w2"<<endl;	
+		cout<<"\tNO es PREFIJO"<<endl;	
 	}
 
-	/* Para indicar si es sufijo (propio o no propio) */
+	/* SUFIJO (PROPIO O NO PROPIO) */
 
 	//la ocurrencia debe ocurrir al final de la cadena
 	regex sufijo(w1 + "$");
@@ -170,13 +173,47 @@ void compararCadenas(string &w1, string &w2)
 	{
 		if(w1!=w2)
 		{
-			cout<<"w1 es SUFIJO PROPIO de w2"<<endl;
+			cout<<"\tes SUFIJO PROPIO"<<endl;
 		}else
 		{
-			cout<<"w1 es SUFIJO NO PROPIO de w2"<<endl;
+			cout<<"\tes SUFIJO NO PROPIO"<<endl;
 		}
 	}else
 	{
-		cout<<"w1 NO es SUFIJO de w2"<<endl;	
+		cout<<"\tNO es SUFIJO"<<endl;	
+	}
+
+	/* SUBCADENA (PROPIO O NO PROPIO) */
+	regex subcadena(w1);
+
+	if(regex_search(w2, subcadena))
+	{
+		if(w1!=w2)
+		{
+			cout<<"\tes SUBCADENA PROPIA"<<endl;
+		}else
+		{
+			cout<<"\tes SUBCADENA NO PROPIA"<<endl;
+		}
+	}else
+	{
+		cout<<"\tNO es SUBCADENA"<<endl;	
+	}
+
+	/* SUBSECUENCIA */
+	for(char c: w1)
+	{
+		cadena += ".*" + string(1,c);
+	}
+
+	cadena += ".*";
+	regex subsecuencia(cadena);
+
+	if(regex_search(w2, subsecuencia))
+	{
+		cout<<"\tes SUBSECUENCIA"<<endl;
+	}else
+	{
+		cout<<"\tNO es SUBSECUENCIA"<<endl;
 	}
 }
