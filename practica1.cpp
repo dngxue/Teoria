@@ -16,6 +16,7 @@ using namespace std;
 
 string leerAlfabeto();
 void leerCadenas(string &w1, string &w2, string alfa);
+void compararCadenas(string &w1, string &w2);
 
 int main()
 {
@@ -29,6 +30,7 @@ int main()
     regex alfabeto(alfa);
     cout<<"\nEl alfabeto ingresado es: "<<alfa<<endl;
     leerCadenas(w1,w2,alfa);
+
 
 	return 0;
 }
@@ -46,6 +48,7 @@ string leerAlfabeto()
 		lee = "";
 		alfa = "";
 		
+		cout<<"\t1) DEFINIR UN ALFABETO"<<endl;
 		cout<<"\t1. El alfabeto debe tener al menos tres simbolos"<<endl;
 		cout<<"\t2. Los simbolos pueden ser ingresados:"<<endl;
 		cout<<"\t\t a. De manera individual\t Ejemplo: a, b, c, e"<<endl;
@@ -59,6 +62,11 @@ string leerAlfabeto()
 	    	// Ingresados de manera individual
 	    	if(lee.length()==1)
 	    	{
+	    		if(lee == "[" || lee == "]")
+	    		{
+	    			lee = "\\" + lee;
+	    		}
+
 	    		alfa += lee;
 
 	    	// Ingresados por rango
@@ -91,6 +99,7 @@ void leerCadenas(string &w1, string &w2, string alfa)
 {
 	// Cero o más ocurrencias del elemento anterior
 	regex alfabeto(alfa + "*");
+	cout<<"\n\t2) INGRESAR DOS CADENAS SOBRE EL ALFABETO DEFINIDO"<<endl;
 	cout<<"\t1. Ingrese dos cadenas w1 y w2"<<endl;
 	cout<<"\t2. Ambos deben ser elementos del alfabeto definido"<<endl;
 
@@ -101,33 +110,37 @@ void leerCadenas(string &w1, string &w2, string alfa)
 
 		if(regex_match(w1,alfabeto))
 		{
-			cout<<"Candena valida";
+			cout<<"Candena valida\n";
 			break;
 		}else
 		{
-			cout<<"Cadena invalida";
+			cout<<"Cadena invalida\n";
 		}
 	}while(true);
 
 	do{
 		w2 = "";
-		cout<<"\n\nb. Ingrese la cadena w2:"<<endl;
+		cout<<"b. Ingrese la cadena w2:"<<endl;
 		cin>>w2;
 
 		if(regex_match(w2,alfabeto))
 		{
-			cout<<"Candena valida";
+			cout<<"Candena valida\n";
 			break;
 		}else
 		{
-			cout<<"Cadena invalida";
+			cout<<"Cadena invalida\n";
 		}
 	}while(true);
 
+	compararCadenas(w1,w2);
 }
 
-void compararCadenas(string &w1, string &w2, string alfa)
+
+void compararCadenas(string &w1, string &w2)
 {
+	cout<<"\n\n\t3) COMPARAR AMBAS CADENAS"<<endl;
+	cout<<"\tComparacion entre la cadena w1 y w2\n\n";
 	/* Para indicar si es prefijo (propio o no propio) */
 
 	//la ocurrencia debe ocurrir al comienzo de la cadena
@@ -135,10 +148,11 @@ void compararCadenas(string &w1, string &w2, string alfa)
 
 	if(regex_search(w2, prefijo))
 	{
-		cout<<"w1 es prefijo de w2"<<endl;
+		cout<<"w1 es PREFIJO de w2"<<endl;
+
 	}else
 	{
-		cout<<"w1 no es prefijo de w2"<<endl;	
+		cout<<"w1 NO es PREFIJO de w2"<<endl;	
 	}
 
 	/* Para indicar si es sufijo (propio o no propio) */
@@ -148,9 +162,9 @@ void compararCadenas(string &w1, string &w2, string alfa)
 
 	if(regex_search(w2, sufijo))
 	{
-		cout<<"w1 es sufijo de w2"<<endl;
+		cout<<"w1 es SUFIJO de w2"<<endl;
 	}else
 	{
-		cout<<"w1 no es sufijo de w2"<<endl;	
+		cout<<"w1 NO es SUFIJO de w2"<<endl;	
 	}
 }
