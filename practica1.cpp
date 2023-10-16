@@ -11,12 +11,16 @@ gcc practica1.cpp -o p1.exe -lstdc++
 #include <stdlib.h>
 #include <regex>
 #include <string>
+#include <random>
 
 using namespace std;
 
-void leerAlfabeto(string &alfa, string &repAlfa);
+void leerAlfabeto(string &alfa, string &repAlfa, vector<char> &letrasAlfa);
 void leerCadenas(string &w1, string &w2, string alfa);
 void compararCadenas(string &w1, string &w2);
+bool palabraRepetida(vector<string> &L, string s);
+void crearLenguajes(vector<char> &letrasAlfa);
+void diferenciaLenguajes(vector<string> &L1, vector<string> &L2);
 void expresionRegular();
 
 int main()
@@ -24,21 +28,23 @@ int main()
     //alfabeto
     string alfa;
 	string repAlfa;
+	vector<char> letrasAlfa;
     //cadenas
     string w1;
     string w2;
 
-    leerAlfabeto(alfa, repAlfa);
+    leerAlfabeto(alfa, repAlfa, letrasAlfa);
     regex alfabeto(alfa);
     cout<<"\nEl alfabeto ingresado es: "<<repAlfa<<endl;
     leerCadenas(w1,w2,alfa);
+	crearLenguajes(letrasAlfa);
     expresionRegular();
 
 
 	return 0;
 }
 
-void leerAlfabeto(string &alfa, string &repAlfa)
+void leerAlfabeto(string &alfa, string &repAlfa, vector<char> &letrasAlfa)
 {
 	char op;
 	string input = "";
@@ -102,7 +108,9 @@ void leerAlfabeto(string &alfa, string &repAlfa)
 					cout << "\nIngrese de nuevo el alfabeto con al menos 3 símbolos:" << endl;
 				}	
 			}
-			
+			for(char c: alfa){
+				letrasAlfa.push_back(c);
+			}
 			alfa = '[' + alfa + ']';
 			if(repAlfa[repAlfa.length()-1] == ',')
 			{
@@ -130,6 +138,9 @@ void leerAlfabeto(string &alfa, string &repAlfa)
 					repAlfa += ", ..., ";
 					repAlfa += alfa[2];
 					repAlfa += '}';
+					for(char i = alfa[0]; i <= alfa[2]; i++){
+						letrasAlfa.push_back(i);
+					}
 					alfa = '[' + alfa + ']';
 					guion = true;
 				}
@@ -303,4 +314,94 @@ void expresionRegular()
 		}
 	}
 
+}
+
+bool palabraRepetida(vector<string> &L, string s){
+	for(string u: L){
+		if(s == u)	return true;
+	}
+	return false;
+}
+
+void imprimirLenguaje(vector<string> &L){
+	for(int i = 0; i < L.size() - 1; i++){
+		cout << L[i] << ", ";
+	}
+	cout << L[L.size()-1] << "}\n";
+
+}
+
+void crearLenguajes(vector<char> &letrasAlfa){
+
+	vector<string> L1;
+	vector<string> L2;
+	string aux;
+	int np, l;
+	random_device rd;
+	mt19937 gen(rd());
+	int min = 0;
+	int max = letrasAlfa.size() - 1;
+	uniform_int_distribution<int> dist(min, max);
+
+	cout<<"\t\033[96m4) GENERAR LOS LENGUAJES L1 Y L2\033[0m"<<endl;
+	cout<<"\t1. Para el lenguaje L1, ingrese el numero de palabras seguido de su longitud"<<endl;
+	
+	bool opInvalida = false;
+	do{
+		if(opInvalida == true) cout << "\tOpcion invalida" << endl;
+		cin >> np >> l;
+		opInvalida = true;
+	}while(np > pow(letrasAlfa.size(), l));
+
+	int i = 0;
+	while(i < np){
+		aux = "";
+		for(int j = 0; j < l; j++){
+			aux += letrasAlfa[dist(gen)];
+		}
+		if(!palabraRepetida(L1, aux)){
+			L1.push_back(aux);
+			i++;
+		}
+	}
+
+	cout<<"\t1. Para el lenguaje L2, ingrese el numero de palabras seguido de su longitud"<<endl;
+
+	cin >> np >> l;
+
+	i = 0;
+	while(i < np){
+		aux = "";
+		for(int j = 0; j < l; j++){
+			aux += letrasAlfa[dist(gen)];
+		}
+		if(!palabraRepetida(L2, aux)){
+			L2.push_back(aux);
+			i++;
+		}
+	}
+
+	cout << "L1 = {";
+	imprimirLenguaje(L1);
+	cout << "L2 = {";
+	imprimirLenguaje(L2);
+
+	diferenciaLenguajes(L1, L2);
+
+}
+
+void diferenciaLenguajes(vector<string> &L1, vector<string> &L2){
+	cout<<"\t\033[96m5) GENERAR LD = L1 - L2\033[0m"<<endl;
+	vector<string> LD;
+	for(string s: L1){
+		if(!palabraRepetida(L2, s))
+			LD.push_back(s);
+	}
+	if(!LD.empty()){
+		cout << "LD = {";
+		imprimirLenguaje(LD);
+	}
+	else{
+		cout << "LD = Lenguaje vacio \n";
+	}
 }
