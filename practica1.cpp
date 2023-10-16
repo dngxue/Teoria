@@ -17,6 +17,7 @@ using namespace std;
 void leerAlfabeto(string &alfa, string &repAlfa);
 void leerCadenas(string &w1, string &w2, string alfa);
 void compararCadenas(string &w1, string &w2);
+void expresionRegular();
 
 int main()
 {
@@ -29,8 +30,9 @@ int main()
 
     leerAlfabeto(alfa, repAlfa);
     regex alfabeto(alfa);
-    cout<<"\nEl alfabeto ingresado es: "<< repAlfa <<endl;
+    cout<<"\nEl alfabeto ingresado es: "<<repAlfa<<endl;
     leerCadenas(w1,w2,alfa);
+    expresionRegular();
 
 
 	return 0;
@@ -53,30 +55,38 @@ void leerAlfabeto(string &alfa, string &repAlfa)
 	
 	do{
 
-		cout<<"\n\tIngrese la opción en \"a\" o \"b\""<<endl;
+		cout<<"\tIngrese la opcion en \"a\" o \"b\""<<endl;
 		cin >> op;
 
 		if(op == 'a'){
-			cout<<"\n\tIngrese el alfabeto:"<<endl;
+
+			cout<<"\nIngrese el alfabeto:"<<endl;
+
 			bool tresSimbolos = false;
-			while(!tresSimbolos){
+
+			while(!tresSimbolos)
+			{
 				alfa = "";
 				repAlfa = "";
 				int cont = 0;
 				tresSimbolos = false;
 				cin >> input;
+
 				for(int i = 0; i < input.length(); i++)
 				{
 					if(input[i] == ',') continue;
-					else{
+					else
+					{
 						int contRepeated = 0;
 						bool repeated = false;
 						// Revisar si se repiten
-						for(int j = 0; j < alfa.length(); j++){
+						for(int j = 0; j < alfa.length(); j++)
+						{
 							if(alfa[j] == input[i])	contRepeated++;
 						}
 						if(contRepeated > 0)	repeated = true;
-						if(!repeated){
+						if(!repeated)
+						{
 							alfa += input[i];
 							repAlfa += input[i];
 							if(i != input.length() - 1)
@@ -85,28 +95,36 @@ void leerAlfabeto(string &alfa, string &repAlfa)
 						}	
 					}	
 				}
+
 				if(cont >= 3)	tresSimbolos = true;
-				else{
-					cout << "\n\tIngrese de nuevo el alfabeto con al menos 3 símbolos:" << endl;
+				else
+				{
+					cout << "\nIngrese de nuevo el alfabeto con al menos 3 símbolos:" << endl;
 				}	
 			}
 			
 			alfa = '[' + alfa + ']';
-			if(repAlfa[repAlfa.length()-1] == ','){
+			if(repAlfa[repAlfa.length()-1] == ',')
+			{
 				repAlfa[repAlfa.length()-1] = '}';
 				repAlfa = '{' + repAlfa;
 			}
 			else
 				repAlfa = '{' + repAlfa + '}';
 		}
-		else if(op == 'b'){
-			cout << "\n\tIngrese el alfabeto por rango:" << endl;
+		else if(op == 'b')
+		{
+			cout << "\nIngrese el alfabeto por rango:" << endl;
 			bool guion = false;
-			while(!guion){
+
+			while(!guion)
+			{
 				alfa = "";
 				repAlfa = "";
 				cin >> alfa;
-				if(alfa.length() == 3 && alfa[1] == '-' && alfa[0] <= alfa[2] && alfa[2] - alfa[0] >= 3){
+
+				if(alfa.length() == 3 && alfa[1] == '-' && alfa[0] <= alfa[2] && alfa[2] - alfa[0] >= 3)
+				{
 					repAlfa = '{' ;
 					repAlfa += alfa[0];
 					repAlfa += ", ..., ";
@@ -117,11 +135,11 @@ void leerAlfabeto(string &alfa, string &repAlfa)
 				}
 				else if (alfa.length() == 3 && alfa[1] == '-' && alfa[2] - alfa[0] < 2 )
 				{
-					cout << "\n\tIngrese de nuevo el alfabeto con al menos 3 símbolos y en orden correcto:" << endl;
+					cout<<"\nIngrese de nuevo el alfabeto con al menos 3 símbolos y en orden correcto:"<<endl;
 				}
 				else
 				{
-					cout << "Ingrese el alfabeto con el formato correcto: " << endl;
+					cout<<"Ingrese el alfabeto con el formato correcto: "<<endl;
 				}
 			}
 		}
@@ -157,7 +175,7 @@ void leerCadenas(string &w1, string &w2, string alfa)
 
 	do{
 		w2 = "";
-		cout<<"b. Ingrese la cadena w2:"<<endl;
+		cout<<"\nb. Ingrese la cadena w2:"<<endl;
 		cin>>w2;
 
 		if(regex_match(w2,alfabeto))
@@ -253,4 +271,36 @@ void compararCadenas(string &w1, string &w2)
 	{
 		cout<<"\tNO es SUBSECUENCIA"<<endl;
 	}
+
+	system("pause");
+}
+
+void expresionRegular()
+{
+	int op;
+	string a = "";
+
+	system("cls");
+	regex expresionr("^[a-df-hj-np-tv-z]*a[a-df-hj-np-tv-z]*e[b-hj-np-tv-z]*i[b-df-np-tv-z]*o[b-df-hj-tv-z]*u[b-df-hj-np-z]*$");
+
+	cout<<"\n\n\t7) IMPLEMENTACION DE UNA EXPRESION REGULAR"<<endl;
+	cout<<"\t1. Todas las cadenas de letras en minusculas (a-z) que contengan las 5 vocales en orden."<<endl;
+	cout<<"\t2. Las vocales pueden estar repetidas siempre que mantengan el orden."<<endl;
+	cout<<"\t3. La secuencia completa de vocales tambien puede repetirse."<<endl;
+	cout<<"\t\ta. Ejemplo de cadena valida: rtaeioujutf"<<endl;
+	cout<<"\t\tb. Ejemplo de cadena invalida: kayteemnoyug"<<endl;
+
+	while(true)
+	{
+		cin>>a;
+		if(regex_match(a,expresionr))
+		{
+			cout<<"Cadena valida"<<endl;
+			break;
+		}else
+		{
+			cout<<"Cadena invalida"<<endl;
+		}
+	}
+
 }
