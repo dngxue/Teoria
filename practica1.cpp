@@ -12,6 +12,7 @@ gcc practica1.cpp -o p1.exe -lstdc++
 #include <regex>
 #include <string>
 #include <random>
+#include <queue>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ void compararCadenas(string &w1, string &w2);
 bool palabraRepetida(vector<string> &L, string s);
 void crearLenguajes(vector<char> &letrasAlfa);
 void diferenciaLenguajes(vector<string> &L1, vector<string> &L2);
+void alfabetoPotencia(vector<char> &letrasAlfa, int potencia);
 void expresionRegular();
 
 int main()
@@ -36,10 +38,10 @@ int main()
     leerAlfabeto(alfa, repAlfa, letrasAlfa);
     regex alfabeto(alfa);
     cout<<"\nEl alfabeto ingresado es: "<<repAlfa<<endl;
-    leerCadenas(w1,w2,alfa);
-	crearLenguajes(letrasAlfa);
-    expresionRegular();
-
+    //leerCadenas(w1,w2,alfa);
+	//crearLenguajes(letrasAlfa);
+    //expresionRegular();
+	alfabetoPotencia(letrasAlfa, 0);
 
 	return 0;
 }
@@ -131,7 +133,7 @@ void leerAlfabeto(string &alfa, string &repAlfa, vector<char> &letrasAlfa)
 				repAlfa = "";
 				cin >> alfa;
 
-				if(alfa.length() == 3 && alfa[1] == '-' && alfa[0] <= alfa[2] && alfa[2] - alfa[0] >= 3)
+				if(alfa.length() == 3 && alfa[1] == '-' && alfa[0] <= alfa[2] && alfa[2] - alfa[0] >= 2)
 				{
 					repAlfa = '{' ;
 					repAlfa += alfa[0];
@@ -404,4 +406,44 @@ void diferenciaLenguajes(vector<string> &L1, vector<string> &L2){
 	else{
 		cout << "LD = Lenguaje vacio \n";
 	}
+}
+
+void alfabetoPotencia(vector<char> &letrasAlfa, int potencia){
+	queue<string> q;
+	string aux;
+	int i, j;
+	vector<string> alfaPotencia;
+	q.push("");
+	int np_parcial;
+
+	if(potencia == 0){
+		cout << "AlfaPotencia = {lambda}\n";
+		return;
+	}
+
+	if(potencia < 0)	potencia = -potencia;
+
+	i = 0;
+	while(i < potencia){
+		np_parcial = pow(letrasAlfa.size(), i);
+		j = 0;
+		while(j < np_parcial){
+			for(char c: letrasAlfa){
+				aux = "" + q.front() + string(1,c);
+				q.push(aux);
+			}
+			q.pop();
+			j++;
+		}
+		i++;
+	}
+
+	while(!q.empty()){
+		alfaPotencia.push_back(q.front());
+		q.pop();
+	}
+
+	cout << "AlfaPotencia = {";
+	imprimirLenguaje(alfaPotencia);
+
 }
