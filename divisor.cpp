@@ -138,6 +138,7 @@ int main(){
     // Guardar los errores en un arreglo
 
     bool comentMultAct = false;
+    bool comillasAct = false;
     bool ant = false;
     bool sig = false;
     int lineaComentUni = 0;
@@ -153,7 +154,6 @@ int main(){
         if(t.linea == lineaComentUni){
             continue;
         }
-
         TipoToken tipo = t.tipo;
         if(tipo == COMENTARIO_UNILINEA){
             lineaComentUni = t.linea;
@@ -169,6 +169,15 @@ int main(){
             lineasError.push_back(t.linea);
         }
         else if(comentMultAct){
+            continue;
+        }
+        else if(tipo == COMILLAS && !comillasAct){
+            comillasAct = true;
+        }
+        else if(tipo == COMILLAS && comillasAct){
+            comillasAct = false;
+        }
+        else if(comillasAct){
             continue;
         }
         else if(tipo == MUERTO){
@@ -201,45 +210,11 @@ int main(){
             }
         }
     }
-
-    // for(TokenProcesado &t: tokensProcesados){
-    //     //cout << "Palabra: " << s.valor << ", Tipo: " << tipoTokenString[s.tipo] <<  ", Linea: " << s.linea << endl;
-        
-    //     if(t.linea == lineaComentUni){
-    //         continue;
-    //     }
-
-    //     TipoToken tipo = t.tipo;
-    //     if(tipo == COMENTARIO_UNILINEA){
-    //         lineaComentUni = t.linea;
-    //     }
-    //     else if(tipo == COMENTARIO_MULTILINEA_INICIO){
-    //         comentMultAct = true;
-    //     }
-    //     else if(tipo == COMENTARIO_MULTILINEA_FIN && comentMultAct){
-    //         comentMultAct = false;
-    //     }
-    //     else if(tipo == COMENTARIO_MULTILINEA_FIN && !comentMultAct){
-    //         errores.push_back(t);
-    //         lineasError.push_back(t.linea);
-    //     }
-    //     else if(comentMultAct){
-    //         continue;
-    //     }
-    //     else if(tipo == MUERTO){
-    //         errores.push_back(t);
-    //         lineasError.push_back(t.linea);
-    //     }
-    //     else if(estadosAceptacion.count(tipo) == 0){
-    //         t.posibleError = t.tipo;
-    //         errores.push_back(t);
-    //         lineasError.push_back(t.linea);
-    //     }
-    // }
+    
     
     for(TokenProcesado e: errores){
         cout << "Error en la linea " << e.linea << ": " << e.valor << endl;
-        cout << "Posible de error: " << tipoTokenString[e.posibleError] << endl;
+        cout << "Posible error: " << tipoTokenString[e.posibleError] << endl;
     }
 
 
@@ -294,13 +269,14 @@ void procesarCadena(string cadena, int num_linea){
 
     // Comparadores de dos caracteres
     if(cadena.size() >= 2){
-        if((cadena[0] == '=' || cadena[1] == '!') && cadena[1] == '='){
+        if((cadena[0] == '=' || cadena[0] == '!') && cadena[1] == '='){
             aux += cadena[0];
             aux += cadena[1];
             tokens.push_back(aux);
             tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             aux = "";
+            cadena = cadena.substr(2);
         }
     }
 
