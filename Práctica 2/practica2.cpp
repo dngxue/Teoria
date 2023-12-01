@@ -26,7 +26,8 @@ enum TipoToken{
     OCTAL,
     POSIBLE_HEXADECIMAL,
     HEXADECIMAL,
-    SIGNO,
+    SIGNO_MENOS,
+    SIGNO_MAS,
     REAL_SIN_EXP,
     PUNTO,
     EXPONENTE,
@@ -46,6 +47,7 @@ enum TipoToken{
     PALABRARESERVADA,
     GUION_BAJO,
     COMILLAS,
+    INCREMENTO,
     MUERTO
 };
 
@@ -58,7 +60,8 @@ unordered_map<TipoToken, string> tipoTokenString = {
     {OCTAL, "OCTAL"},
     {POSIBLE_HEXADECIMAL, "POSIBLE_HEXADECIMAL"},
     {HEXADECIMAL, "HEXADECIMAL"},
-    {SIGNO, "SIGNO"},
+    {SIGNO_MENOS, "SIGNO_MENOS"},
+    {SIGNO_MAS, "SIGNO_MAS"},
     {REAL_SIN_EXP, "REAL_SIN_EXP"},
     {PUNTO, "PUNTO"},
     {EXPONENTE, "EXPONENTE"},
@@ -78,6 +81,7 @@ unordered_map<TipoToken, string> tipoTokenString = {
     {PALABRARESERVADA, "PALABRARESERVADA"},
     {GUION_BAJO, "GUION_BAJO"},
     {COMILLAS, "COMILLAS"},
+    {INCREMENTO, "INCREMENTO"},
     {MUERTO, "MUERTO"}
 };
 
@@ -104,10 +108,10 @@ unordered_set<char> operadores = {'*','/','<','>','=', '%'};
 unordered_set<char> signos = {'+','-'};
 unordered_set<char> octal = {'0', '1', '2', '3', '4', '5', '6', '7'};
 unordered_set<char> hexadecimal = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-unordered_set<string> palabras_reservadas_java = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const","public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "true", "false", "null", };
-unordered_set<TipoToken> estadosAceptacion = {DECIMAL, OCTAL, HEXADECIMAL, REAL_SIN_EXP, DECIMAL1EXP, DECIMAL2EXP, COMPARADOR, ASIGNACION, ASTERISCO, COMENTARIO_MULTILINEA_INICIO, COMENTARIO_MULTILINEA_FIN, COMENTARIO_UNILINEA, IDENTIFICADOR, PALABRARESERVADA, SIGNO, COMILLAS, DIAGONAL, MODULO};
-unordered_set<TipoToken> estadosComparacion = {DECIMAL, OCTAL, HEXADECIMAL, REAL_SIN_EXP, DECIMAL1EXP, DECIMAL2EXP, IDENTIFICADOR};
-unordered_set<TipoToken> operadores_comparadores = {ASTERISCO, DIAGONAL, MODULO, COMPARADOR, SIGNO};
+unordered_set<string> palabras_reservadas_java = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const","public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "true", "false", "null", "System.out.println"};
+unordered_set<TipoToken> estadosAceptacion = {DECIMAL, OCTAL, HEXADECIMAL, REAL_SIN_EXP, DECIMAL1EXP, DECIMAL2EXP, COMPARADOR, ASIGNACION, ASTERISCO, COMENTARIO_MULTILINEA_INICIO, COMENTARIO_MULTILINEA_FIN, COMENTARIO_UNILINEA, IDENTIFICADOR, PALABRARESERVADA, SIGNO_MENOS, SIGNO_MAS, COMILLAS, DIAGONAL, MODULO, INCREMENTO};
+unordered_set<TipoToken> estadosComparacion = {DECIMAL, OCTAL, HEXADECIMAL, REAL_SIN_EXP, DECIMAL1EXP, DECIMAL2EXP, IDENTIFICADOR, PALABRARESERVADA, COMILLAS};
+unordered_set<TipoToken> operadores_comparadores = {ASTERISCO, DIAGONAL, MODULO, COMPARADOR, SIGNO_MENOS, SIGNO_MAS};
 
 // Variables globales
 TipoToken posibleError = INICIAL;
@@ -118,7 +122,7 @@ vi lineasError;
 
 // Funciones
 void procesarCadena(string cadena, int num_linea);
-TipoToken ADF(string token);
+TipoToken AFD(string token);
 bool esComparable(TipoToken tipoAnt, TipoToken tipoSig);
 
 int main(){
@@ -130,6 +134,9 @@ int main(){
     string linea;
     string cadena;
     int num_linea = 1;
+
+    // Por facilidad de implementación
+    tokensProcesados.push_back(TokenProcesado(INICIAL, "", num_linea));
 
     /*  mientras sea posible leer una línea completa 
         del archivo y almacenarla en la variable línea */
@@ -143,6 +150,9 @@ int main(){
             extrae una palabra del flujo de entrada ss 
             en cada iteración se extráe una nueva palabra y
             se almacena en la variable cadena */
+
+
+
         while(ss >> cadena){
             /*  se manda la palabra actual y el numero
                 de línea actual */
@@ -152,6 +162,9 @@ int main(){
             línea acutal, sigue a la siguiente línea */
         num_linea++;
     }
+
+    // Por facilidad de implementación
+    tokensProcesados.push_back(TokenProcesado(INICIAL, "", num_linea));
 
     bool comentMultAct = false;
     bool comillasAct = false;
@@ -243,6 +256,16 @@ int main(){
                 lineasError.push_back(t.linea);
             }
         }
+        else if(tipo == INCREMENTO){
+            if(t_ant.tipo == IDENTIFICADOR){
+                continue;
+            }
+            else{
+                t.posibleError = t.tipo;
+                errores.push_back(t);
+                lineasError.push_back(t.linea);
+            }
+        }
     }
     
     if(errores.empty()){
@@ -289,7 +312,7 @@ void procesarCadena(string cadena, int num_linea){
                 este objeto se agrega al final de otro vector 
                 llamado tokensProcesados
             */
-            tokensProcesados.push_back(TokenProcesado(ADF(cadena), cadena, num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD(cadena), cadena, num_linea));
             /*  devuelve un iterador al último elemento del vector
                 NO ENTENDER *************************************
 
@@ -305,7 +328,7 @@ void procesarCadena(string cadena, int num_linea){
     if(cadena.size() >= 2){
         if(cadena[0] == '/' && cadena[1] == '*'){
             tokens.push_back(cadena);
-            tokensProcesados.push_back(TokenProcesado(ADF(cadena), cadena, num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD(cadena), cadena, num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             return;
         }
@@ -314,7 +337,7 @@ void procesarCadena(string cadena, int num_linea){
     if(cadena.size() >= 2){
         if(cadena[0] == '*' && cadena[1] == '/'){
             tokens.push_back("*/");
-            tokensProcesados.push_back(TokenProcesado(ADF("*/"), "*/", num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD("*/"), "*/", num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             return;
         }
@@ -323,12 +346,25 @@ void procesarCadena(string cadena, int num_linea){
     // Comparadores de dos caracteres
     if(cadena.size() >= 2){
         /* operador de igualdad o desigualdad */
-        if((cadena[0] == '=' || cadena[0] == '!') && cadena[1] == '='){
+        if((cadena[0] == '=' || cadena[0] == '!' || cadena[0] == '+' || cadena[0] == '-' || cadena[0] == '>' || cadena[0] == '<') && cadena[1] == '='){
             /* se concatenan en la cadena aux */
             aux += cadena[0];
             aux += cadena[1];
             tokens.push_back(aux);
-            tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
+            tokensProcesados.rbegin()->posibleError = posibleError;
+            aux = "";
+            /*  se eliminan los dos primeros caracteres de 
+                la cadena, una vez que fueron procesados
+                y almacenados */
+            cadena = cadena.substr(2);
+        }
+        else if((cadena[0] == '+' && cadena[1] == '+') || (cadena[0] == '-' && cadena[1] == '-')){
+            /* se concatenan en la cadena aux */
+            aux += cadena[0];
+            aux += cadena[1];
+            tokens.push_back(aux);
+            tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             aux = "";
             /*  se eliminan los dos primeros caracteres de 
@@ -337,6 +373,8 @@ void procesarCadena(string cadena, int num_linea){
             cadena = cadena.substr(2);
         }
     }
+
+
 
     // Por cada caracter especial, divide la cadena y agrega el resultado a tokens
     /* itera a través de cada caracter c de la cadena */
@@ -350,7 +388,7 @@ void procesarCadena(string cadena, int num_linea){
                 tokens.push_back(aux);
                 /*  se crea un nuevo objeto que se agrega al
                     final del vector tokens procesados */
-                tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+                tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
                 tokensProcesados.rbegin()->posibleError = posibleError;
             }
             aux = "";
@@ -358,13 +396,13 @@ void procesarCadena(string cadena, int num_linea){
         else if(comillas.count(c)){
             if(!aux.empty()){
                 tokens.push_back(aux);
-                tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+                tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
                 tokensProcesados.rbegin()->posibleError = posibleError;
             }
             aux = "";
             aux += c;
             tokens.push_back(aux);
-            tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             aux = "";
         }
@@ -375,13 +413,13 @@ void procesarCadena(string cadena, int num_linea){
         else if(operadores.count(c)){
             if(!aux.empty()){
                 tokens.push_back(aux);
-                tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+                tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
                 tokensProcesados.rbegin()->posibleError = posibleError;
             }
             aux = "";
             aux += c;
             tokens.push_back(aux);
-            tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+            tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
             tokensProcesados.rbegin()->posibleError = posibleError;
             aux = "";
         }
@@ -393,13 +431,13 @@ void procesarCadena(string cadena, int num_linea){
 
     if(!aux.empty()){
         tokens.push_back(aux);
-        tokensProcesados.push_back(TokenProcesado(ADF(aux), aux, num_linea));
+        tokensProcesados.push_back(TokenProcesado(AFD(aux), aux, num_linea));
         tokensProcesados.rbegin()->posibleError = posibleError;
     }
 }
 
 /* devuelve el tipo de token */
-TipoToken ADF(string token){
+TipoToken AFD(string token){
     TipoToken Estado = INICIAL;
     /* itera cada caracter c en la cadena token */
     for(char c: token){
@@ -427,8 +465,11 @@ TipoToken ADF(string token){
                 else if(c == '0'){
                     Estado = OCTAL_O_HEXADECIMAL;
                 }
-                else if(signos.count(c)){
-                    Estado = SIGNO;
+                else if(c == '+'){
+                    Estado = SIGNO_MAS;
+                }
+                else if(c == '-'){
+                    Estado = SIGNO_MENOS;
                 }
                 else if(c == '<' || c == '>'){
                     Estado = COMPARADOR;
@@ -531,12 +572,35 @@ TipoToken ADF(string token){
                 Estado = MUERTO;
                 break;
 
-            case SIGNO:
+            case SIGNO_MAS:
                 if(isdigit(c) && c != '0'){
                     Estado = DECIMAL;
                 }
                 else if(c == '0'){
                     Estado = OCTAL_O_HEXADECIMAL;
+                }
+                else if(c == '='){
+                    Estado = ASIGNACION;
+                }
+                else if(c == '+'){
+                    Estado = INCREMENTO;
+                }
+                else{
+                    Estado = MUERTO;
+                }
+                break;
+            case SIGNO_MENOS:
+                if(isdigit(c) && c != '0'){
+                    Estado = DECIMAL;
+                }
+                else if(c == '0'){
+                    Estado = OCTAL_O_HEXADECIMAL;
+                }
+                else if(c == '='){
+                    Estado = ASIGNACION;
+                }
+                else if(c == '+'){
+                    Estado = INCREMENTO;
                 }
                 else{
                     Estado = MUERTO;
@@ -548,6 +612,9 @@ TipoToken ADF(string token){
                 }
                 else if(octal.count(c)){
                     Estado = OCTAL;
+                }
+                else if(c == '.'){
+                    Estado = PUNTO;
                 }
                 else{
                     Estado = MUERTO;
@@ -647,7 +714,7 @@ TipoToken ADF(string token){
 
 bool esComparable(TipoToken tipoAnt, TipoToken tipoSig){
     /*  si el tipo anterior o el tipo siguiente no está dentro de los 
-        estados de compareción, retorna false
+        estados de comparación, retorna false
     */
     if(estadosComparacion.count(tipoAnt) == 0 || estadosComparacion.count(tipoSig) == 0){
         return false;
