@@ -1,0 +1,83 @@
+Expresion: areaT += (3.1E+2 * radio) + (cte * var2);
+
+Simbolo: IDENTIFICADOR
+Estado: ID_INICIAL
+Pila: Z
+
+Simbolo: OPERADORASIGNACION
+Estado: IGUALDAD
+Pila: Z
+
+Simbolo: PARENTESISABRIR
+Estado: EXPRESION
+Pila: (
+
+Simbolo: DECIMAL1EXP
+Estado: NUMERO
+Pila: (
+
+Simbolo: ASTERISCO
+Estado: OPERADOR
+Pila: O
+
+Simbolo: IDENTIFICADOR
+Estado: ID
+Pila: O
+
+Simbolo: PARENTESISCERRAR
+Estado: ID
+Pila: Z
+
+Simbolo: SIGNO_MAS
+Estado: OPERADOR
+Pila: O
+
+Simbolo: PARENTESISABRIR
+Estado: EXPRESION
+Pila: (
+
+Simbolo: IDENTIFICADOR
+Estado: ID
+Pila: (
+
+Simbolo: ASTERISCO
+Estado: OPERADOR
+Pila: O
+
+Simbolo: IDENTIFICADOR
+Estado: ID
+Pila: O
+
+Simbolo: PARENTESISCERRAR
+Estado: ID
+Pila: Z
+
+Simbolo: PUNTOYCOMA
+Estado: ID
+
+La expresion es valida
+
+Arbol de derivacion:
+Inicio[areaT += (3.1E+2 * radio) + (cte * var2)]: Identificador[areaT], =[+=], Igualdad[(3.1E+2 * radio) + (cte * var2)], ;[;]
+Igualdad[(3.1E+2 * radio) + (cte * var2)]: Expresion[(3.1E+2 * radio) + (cte * var2)]
+Expresion[(3.1E+2 * radio) + (cte * var2)]: Expresion[(3.1E+2 * radio)], Operador[+], Expresion[(cte * var2)]
+Expresion[(3.1E+2 * radio)]: Termino[(3.1E+2 * radio)]
+Termino[(3.1E+2 * radio)]: ([(], Expresion[3.1E+2 * radio], )[)]
+Expresion[3.1E+2 * radio]: Expresion[3.1E], Operador[+], Expresion[2 * radio]
+Expresion[3.1E]: Termino[3.1E]
+Operador[+]: +[+]
+Expresion[2 * radio]: Expresion[2], Operador[*], Expresion[radio]
+Expresion[2]: Termino[2]
+Termino[2]: Numero[2]
+Operador[*]: *[*]
+Expresion[radio]: Termino[radio]
+Termino[radio]: Identificador[radio]
+Operador[+]: +[+]
+Expresion[(cte * var2)]: Termino[(cte * var2)]
+Termino[(cte * var2)]: ([(], Expresion[cte * var2], )[)]
+Expresion[cte * var2]: Expresion[cte], Operador[*], Expresion[var2]
+Expresion[cte]: Termino[cte]
+Termino[cte]: Identificador[cte]
+Operador[*]: *[*]
+Expresion[var2]: Termino[var2]
+Termino[var2]: Identificador[var2]

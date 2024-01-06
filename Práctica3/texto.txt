@@ -1,0 +1,1 @@
+areaT += (3.1E+2 * radio) + (cte * var2);
