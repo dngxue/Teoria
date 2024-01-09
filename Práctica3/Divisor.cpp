@@ -180,7 +180,7 @@ set<char> octal = {'0', '1', '2', '3', '4', '5', '6', '7'};
 set<char> hexadecimal = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 set<string> palabras_reservadas_java = {"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const","public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "true", "false", "null", "System.out.println"};
 
-set<TipoToken> operadoresAP = {ASTERISCO, DIAGONAL, COMPARADOR, EXCLAMACION, ASIGNACION, OPERADORASIGNACION, SIGNO_MAS, SIGNO_MENOS, MODULO};
+set<TipoToken> operadoresAP = {ASTERISCO, DIAGONAL, COMPARADOR, EXCLAMACION, ASIGNACION, SIGNO_MAS, SIGNO_MENOS, MODULO};
 set<TipoToken> asignacion = {ASIGNACION, OPERADORASIGNACION};
 set<TipoToken> numero = {DECIMAL, OCTAL, HEXADECIMAL, REAL_SIN_EXP, DECIMAL1EXP, DECIMAL2EXP};
 
@@ -280,6 +280,9 @@ int main(){
                 else if(operadoresAP.count(simbolo) && Pila.top() == 'Z'){
                     Estado = OPERADOR;
                     Pila.push('O');
+                }
+                else if(simbolo == PUNTOYCOMA && Pila.top() == 'Z'){
+                    Pila.pop();
                 }
                 else{
                     Estado = NO_ACEPTADO;
@@ -817,7 +820,7 @@ TipoToken AFD(string token){
                 }
                 break;
             case IDENTIFICADOR:
-                if(isalpha(c) || isdigit(c) || c == '$' || c == '_'){
+                if(isalpha(c) || isdigit(c) || c == '_'){
                     Estado = IDENTIFICADOR;
                 }
                 else{
@@ -840,9 +843,6 @@ void arbolDerivacion(string s){
     string aux = s;
     bool puntoComa = false;
 
-    /* verifica si la expresión termina con ;
-       si es así, elimina el ; de la expresión y establece la
-       variable ; en true */
     if(aux[aux.size() - 1] == ';'){
         aux = aux.substr(0, aux.size() - 1);
         puntoComa = true;
@@ -882,19 +882,12 @@ void Procesarsimbolo(string aux, nodo *anterior, queue<nodo *> &nodosPorProcesar
         return;
     }
 
-    /* agregarDerivacion agrega un nuevo nodo al vector derivacion del nodo
-       actual */
-
-
     if(anterior->simbolo == "Inicio"){
-        /* si no se encuentra '=' */
         if(aux.find('=') == string::npos){
             /* agrega una derivación al nodo actual */
             anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux);
         }
         else{
-            /* verifica si el caracter antes del '=' es un operador 
-               agrega la derivación de identificador e igualdad */ 
             if(operadores.count(aux[aux.find('=')-1])){
                 anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')-1));
                 anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", string(1, aux[aux.find('=')-1])+"=");
@@ -903,10 +896,7 @@ void Procesarsimbolo(string aux, nodo *anterior, queue<nodo *> &nodosPorProcesar
                 anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')));
                 anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", "=");
             }
-            /* agrega otra derivación al nodo actual representando el
-               símbolo de igualdad y la parte de la cadena después de '=' */
             anterior->agregarDerivacion("\x1b[33mIgualdad\x1b[0m", aux.substr(aux.find('=') + 1, aux.size()));
-            /* agrega el nodo recién creado a la cola de nodos por procesar */
             nodosPorProcesar.push(anterior->derivacion[2]);
         }
     }
@@ -1009,6 +999,8 @@ bool expresionOperador(string aux, nodo *anterior, queue<nodo *> &nodosPorProces
             nodosPorProcesar.push(anterior->derivacion[2]);
             Eant = false;
             return true;
+        }else{
+            Eant = false;
         }
     }
     return false;
