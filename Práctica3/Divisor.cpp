@@ -1,3 +1,6 @@
+/* para compilar: 
+g++ Divisor.cpp -o divisor.exe */
+
 #include <bits/stdc++.h>
 
 #define endl '\n'
@@ -19,8 +22,8 @@ typedef vector<vi> vvi;
 typedef vector<p2i> vp2i;
 
 const int SIZE = 1e5 + 1,INF = 1e8 + 1;
-// Estados AFD 
 
+// Estados AFD 
 enum TipoToken{
     INICIAL,
     DECIMAL,
@@ -57,8 +60,8 @@ enum TipoToken{
     MUERTO
 };
 
-// Estados automata de pila
 
+// Estados automata de pila
 enum EstadoAPila{
     INICIO,
     ID_INICIAL,
@@ -70,10 +73,6 @@ enum EstadoAPila{
     ID,
     NO_ACEPTADO
 };
-
-/*  clave: TipoToken
-    valor: string
-    cadena asociada a un tipo de token */
 
 unordered_map<TipoToken, string> tipoTokenString = {
     {INICIAL, "INICIAL"},
@@ -111,6 +110,9 @@ unordered_map<TipoToken, string> tipoTokenString = {
     {MUERTO, "MUERTO"}
 };
 
+/*  clave: TipoToken
+    valor: string
+    cadena asociada a un tipo de token */
 unordered_map<EstadoAPila, string> estadoAPilaString = {
     {INICIO, "INICIO"},
     {ID_INICIAL, "ID_INICIAL"},
@@ -139,20 +141,30 @@ string borrarEspacios(string s);
 class nodo{
 
     public:
+    // simbolo asociado con el nodo
     string simbolo;
+    // cadena asociado con el nodo
     string cadena;
+    /* almacena punteros a los nodos que son derivaciones
+       de este nodo en la estructura del arbol */
     vector<nodo *> derivacion;
 
+    /* constructor que inicializa el nodo con un símbolo
+       y una cadena */
     nodo(string val, string cad){
         simbolo = val;
         cadena = borrarEspacios(cad);
     }
 
+    /* agrega una derivación al nodo actual 
+       crea un nuevo nodo con el símbolo y la
+       cadena especificados */
     void agregarDerivacion(string s, string cad){
         nodo *aux = new nodo(s, cad);
         derivacion.pb(aux);
     }
 
+    // retorna el valor del símbolo asociado con el nodo
     string getValor(){
         return simbolo;
     }
@@ -208,13 +220,15 @@ int main(){
         }
     }
 
-    cout << "Expresion: " << linea << endl << endl;
+    // imprimir la expresion
+    cout << " \n\x1B[38;2;255;128;0m Expresion:\x1B[0m" << linea << endl << endl;
 
-    // Automata de Pila para validad expresiones en C con una
-    // cinta de entrada con los estados de cada token como símbolos
+    /*  Automata de Pila para validar expresiones en C con una
+        cinta de entrada con los estados de cada token como símbolos */
     EstadoAPila Estado = INICIO;
     stack<char> Pila;
     Pila.push('Z');
+    /* itera sobre cada elemento del vector tokensProcesados*/
     for(TokenProcesado token: tokensProcesados){
         TipoToken simbolo = token.tipo;
         if(Pila.empty()){
@@ -225,6 +239,7 @@ int main(){
             break;
         }
 
+        /* determinar las transiciones según el tipo de token */
         switch(Estado){
             case INICIO:
                 if(simbolo == IDENTIFICADOR && Pila.top() == 'Z'){
@@ -235,6 +250,7 @@ int main(){
                 }
                 break;
             case ID_INICIAL:
+                /* si el tipo de toquen está presente en el conjunto asignación */
                 if(asignacion.count(simbolo) && Pila.top() == 'Z'){
                     Estado = IGUALDAD;
                 }
@@ -378,19 +394,19 @@ int main(){
                 }
                 break;
         }
-        cout << "Simbolo: " << tipoTokenString[simbolo] << endl;
-        cout << "Estado: " << estadoAPilaString[Estado] << endl;
+        cout << " \033[36mSimbolo: \033[0m" << tipoTokenString[simbolo] << endl;
+        cout << " \033[35mEstado: \033[0m" << estadoAPilaString[Estado] << endl;
         if(!Pila.empty())
-            cout << "Pila: " << Pila.top() << endl;
+            cout << " \033[33mPila: \033[0m" << Pila.top() << endl;
         cout << endl;
     }
 
     if(Pila.empty() && Estado != NO_ACEPTADO){
-        cout << "La expresion es valida" << endl << endl;
+        cout << "\033[42mACEPTADO\033[0m" << endl << endl;
         arbolDerivacion(linea);
     }
     else{
-        cout << "La expresion no es valida" << endl;
+        cout << "\033[41mNO ACEPTADO\033[0m" << endl;
     }
     
 
@@ -820,15 +836,24 @@ TipoToken AFD(string token){
 // Funciones arbolderivacion
 void arbolDerivacion(string s){
 
-    cout << "Arbol de derivacion:" << endl;
+    cout << "ARBOL DE DERIVACION\n" << endl;
     string aux = s;
     bool puntoComa = false;
+
+    /* verifica si la expresión termina con ;
+       si es así, elimina el ; de la expresión y establece la
+       variable ; en true */
     if(aux[aux.size() - 1] == ';'){
         aux = aux.substr(0, aux.size() - 1);
         puntoComa = true;
     }
+
+    /* se crea un nodo raiz
+       se le asigna el símbolo inicio y la cadena aux como su valor */
     nodo raiz = nodo("Inicio", aux);
+    // apunta al nodo raiz
     nodo *anterior = &raiz;
+
 
     queue<nodo *> nodosPorProcesar;
     nodosPorProcesar.push(anterior);
@@ -849,67 +874,79 @@ void arbolDerivacion(string s){
     }
 
     preOrden(&raiz);
-
 }
+
 
 void Procesarsimbolo(string aux, nodo *anterior, queue<nodo *> &nodosPorProcesar){
     if(aux.size() == 0){
         return;
     }
 
+    /* agregarDerivacion agrega un nuevo nodo al vector derivacion del nodo
+       actual */
+
+
     if(anterior->simbolo == "Inicio"){
+        /* si no se encuentra '=' */
         if(aux.find('=') == string::npos){
-            anterior->agregarDerivacion("Identificador", aux);
+            /* agrega una derivación al nodo actual */
+            anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux);
         }
         else{
+            /* verifica si el caracter antes del '=' es un operador 
+               agrega la derivación de identificador e igualdad */ 
             if(operadores.count(aux[aux.find('=')-1])){
-                anterior->agregarDerivacion("Identificador", aux.substr(0, aux.find('=')-1));
-                anterior->agregarDerivacion("=", string(1, aux[aux.find('=')-1])+"=");
+                anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')-1));
+                anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", string(1, aux[aux.find('=')-1])+"=");
             }
             else{
-                anterior->agregarDerivacion("Identificador", aux.substr(0, aux.find('=')));
-                anterior->agregarDerivacion("=", "=");
+                anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')));
+                anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", "=");
             }
-            anterior->agregarDerivacion("Igualdad", aux.substr(aux.find('=') + 1, aux.size()));
+            /* agrega otra derivación al nodo actual representando el
+               símbolo de igualdad y la parte de la cadena después de '=' */
+            anterior->agregarDerivacion("\x1b[33mIgualdad\x1b[0m", aux.substr(aux.find('=') + 1, aux.size()));
+            /* agrega el nodo recién creado a la cola de nodos por procesar */
             nodosPorProcesar.push(anterior->derivacion[2]);
         }
     }
-    else if(anterior->simbolo == "Igualdad"){
+
+    else if(anterior->simbolo == "\x1b[33mIgualdad\x1b[0m"){
         if(aux.find('=') == string::npos){
-            anterior->agregarDerivacion("Expresion", aux);
+            anterior->agregarDerivacion("\x1B[36mExpresion\x1B[0m", aux);
             nodosPorProcesar.push(anterior->derivacion[0]);
         }
         else{
             if(operadores.count(aux[aux.find('=')-1])){
-                anterior->agregarDerivacion("Identificador", aux.substr(0, aux.find('=')-1));
-                anterior->agregarDerivacion("=", string(1, aux[aux.find('=')-1])+"=");
+                anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')-1));
+                anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", string(1, aux[aux.find('=')-1])+"=");
             }
             else{
-                anterior->agregarDerivacion("Identificador", aux.substr(0, aux.find('=')));
-                anterior->agregarDerivacion("=", "=");
+                anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux.substr(0, aux.find('=')));
+                anterior->agregarDerivacion("\x1B[38;2;17;245;120mAsignacion\x1B[0m", "=");
             }
-            anterior->agregarDerivacion("Igualdad", aux.substr(aux.find('=') + 1, aux.size()));
+            anterior->agregarDerivacion("\x1b[33mIgualdad\x1b[0m", aux.substr(aux.find('=') + 1, aux.size()));
             nodosPorProcesar.push(anterior->derivacion[2]);
         }
     }
-    else if(anterior->simbolo == "Expresion"){
+    else if(anterior->simbolo == "\x1B[36mExpresion\x1B[0m"){
         if(expresionOperador(aux, anterior, nodosPorProcesar));
         else if(terminoParentesis(aux, anterior, nodosPorProcesar));
         else{
-            anterior->agregarDerivacion("Termino", aux);
+            anterior->agregarDerivacion("\x1B[38;2;255;128;0mTermino\x1b[0m", aux);
             nodosPorProcesar.push(anterior->derivacion[0]);
         }
     }
     
-    else if(anterior->simbolo == "Termino"){
+    else if(anterior->simbolo == "\x1B[38;2;255;128;0mTermino\x1b[0m"){
         if(AFD(aux) == IDENTIFICADOR){
-            anterior->agregarDerivacion("Identificador", aux);
+            anterior->agregarDerivacion("\x1b[35mIdentificador\x1b[0m", aux);
         }
         else if(numero.count(AFD(aux))){
-            anterior->agregarDerivacion("Numero", aux);
+            anterior->agregarDerivacion("\x1b[32mNumero\x1b[0m", aux);
         }
     }
-    else if(anterior->simbolo == "Operador"){
+    else if(anterior->simbolo == "\x1B[31mOperador\x1B[0m"){
         anterior->agregarDerivacion(aux, aux);
     }
 }
@@ -917,10 +954,10 @@ void Procesarsimbolo(string aux, nodo *anterior, queue<nodo *> &nodosPorProcesar
 // Detectar termino de la forma (<Expresion>)
 bool terminoParentesis(string aux, nodo *anterior, queue<nodo *> &nodosPorProcesar){
     if(aux[0] == '(' && aux[aux.size() - 1] == ')'){
-        anterior->agregarDerivacion("Termino", aux);
+        anterior->agregarDerivacion("\x1B[38;2;255;128;0mTermino\x1b[0m", aux);
         anterior = anterior->derivacion[0];
         anterior->agregarDerivacion("(", "(");
-        anterior->agregarDerivacion("Expresion", aux.substr(1, aux.size() - 2));
+        anterior->agregarDerivacion("\x1B[36mExpresion\x1B[0m", aux.substr(1, aux.size() - 2));
         nodosPorProcesar.push(anterior->derivacion[1]);
         anterior->agregarDerivacion(")", ")");
         return true;
@@ -937,32 +974,40 @@ bool expresionOperador(string aux, nodo *anterior, queue<nodo *> &nodosPorProces
     int contpA = 0;
     int contpB = 0;
     for(int i = 0; i < aux.size(); i++){
+        // si el primer caracter
         if(i == 0 && signos.find(aux[i]) != signos.end()){
+            Eant = false;
             continue;
         }
 
         else if(aux[i] == 'E'){
+            // + / - actuan como signo de un num exponencial
             Eant = true;
             continue;
         }
 
         else if(aux[i] == '('){
             contpA++;
+            Eant = false;
         }
 
         else if(aux[i] == ')'){
             contpB++;
+            Eant = false;
         }
         else if(contpA > contpB){
+            Eant = false;
             continue;
         }
-        else if(operadores.find(aux[i]) != operadores.end()){
-            anterior->agregarDerivacion("Expresion", aux.substr(0, i));
+        // cuando Eant no es parte de un num exponencial
+        else if(operadores.find(aux[i]) != operadores.end() && !Eant){
+            anterior->agregarDerivacion("\x1B[36mExpresion\x1B[0m", aux.substr(0, i));
             nodosPorProcesar.push(anterior->derivacion[0]);
-            anterior->agregarDerivacion("Operador", string(1, aux[i]));
+            anterior->agregarDerivacion("\x1B[31mOperador\x1B[0m", string(1, aux[i]));
             nodosPorProcesar.push(anterior->derivacion[1]);
-            anterior->agregarDerivacion("Expresion", aux.substr(i + 1, aux.size()));
+            anterior->agregarDerivacion("\x1B[36mExpresion\x1B[0m", aux.substr(i + 1, aux.size()));
             nodosPorProcesar.push(anterior->derivacion[2]);
+            Eant = false;
             return true;
         }
     }
